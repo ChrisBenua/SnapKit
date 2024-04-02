@@ -21,64 +21,80 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#if os(iOS) || os(tvOS)
+#if canImport(UIKit)
     import UIKit
 #else
     import AppKit
 #endif
 
 
-public protocol LayoutConstraintItem: class {
+public protocol LayoutConstraintItem: AnyObject {
+    func asConstraintView() -> ConstraintView?
+    func asConstraintLayoutGuide() -> ConstraintLayoutGuide?
 }
 
 @available(iOS 9.0, OSX 10.11, *)
 extension ConstraintLayoutGuide : LayoutConstraintItem {
+    public func asConstraintView() -> ConstraintView? {
+        nil
+    }
+
+    public func asConstraintLayoutGuide() -> ConstraintLayoutGuide? {
+        return self
+    }
 }
 
 extension ConstraintView : LayoutConstraintItem {
+    public func asConstraintView() -> ConstraintView? {
+        self
+    }
+
+    public func asConstraintLayoutGuide() -> ConstraintLayoutGuide? {
+        nil
+    }
 }
 
 
 extension LayoutConstraintItem {
-    
+
     internal func prepare() {
-        if let view = self as? ConstraintView {
+        if let view = self.asConstraintView() {
             view.translatesAutoresizingMaskIntoConstraints = false
         }
     }
-    
+
     internal var superview: ConstraintView? {
-        if let view = self as? ConstraintView {
+        if let view = self.asConstraintView() {
             return view.superview
         }
-        
-        if #available(iOS 9.0, OSX 10.11, *), let guide = self as? ConstraintLayoutGuide {
+
+        if #available(iOS 9.0, OSX 10.11, *), let guide = self.asConstraintLayoutGuide() {
             return guide.owningView
         }
-        
+
         return nil
     }
     internal var constraints: [Constraint] {
         return self.constraintsSet.allObjects as! [Constraint]
     }
-    
+
     internal func add(constraints: [Constraint]) {
         let constraintsSet = self.constraintsSet
         for constraint in constraints {
             constraintsSet.add(constraint)
         }
     }
-    
+
     internal func remove(constraints: [Constraint]) {
         let constraintsSet = self.constraintsSet
         for constraint in constraints {
             constraintsSet.remove(constraint)
         }
     }
-    
+
     private var constraintsSet: NSMutableSet {
         let constraintsSet: NSMutableSet
-        
+
         if let existing = objc_getAssociatedObject(self, &constraintsKey) as? NSMutableSet {
             constraintsSet = existing
         } else {
@@ -86,8 +102,8 @@ extension LayoutConstraintItem {
             objc_setAssociatedObject(self, &constraintsKey, constraintsSet, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
         return constraintsSet
-        
+
     }
-    
+
 }
 private var constraintsKey: UInt8 = 0

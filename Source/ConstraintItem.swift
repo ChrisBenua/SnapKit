@@ -21,7 +21,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#if os(iOS) || os(tvOS)
+#if canImport(UIKit)
     import UIKit
 #else
     import AppKit
@@ -29,19 +29,26 @@
 
 
 public final class ConstraintItem {
-    
+
     internal weak var target: AnyObject?
     internal let attributes: ConstraintAttributes
-    
+    internal weak var _layoutConstraintItem: LayoutConstraintItem?
+
     internal init(target: AnyObject?, attributes: ConstraintAttributes) {
         self.target = target
+        self._layoutConstraintItem = nil
         self.attributes = attributes
     }
-    
-    internal var layoutConstraintItem: LayoutConstraintItem? {
-        return self.target as? LayoutConstraintItem
+
+    internal init(layoutConstraintItem: LayoutConstraintItem?, attributes: ConstraintAttributes) {
+        self._layoutConstraintItem = layoutConstraintItem
+        self.target = layoutConstraintItem
+        self.attributes = attributes
     }
-    
+
+    internal var layoutConstraintItem: LayoutConstraintItem? {
+        _layoutConstraintItem
+    }
 }
 
 public func ==(lhs: ConstraintItem, rhs: ConstraintItem) -> Bool {
@@ -49,13 +56,25 @@ public func ==(lhs: ConstraintItem, rhs: ConstraintItem) -> Bool {
     guard lhs !== rhs else {
         return true
     }
-    
+
     // must both have valid targets and identical attributes
-    guard let target1 = lhs.target,
-          let target2 = rhs.target,
+    guard let target1 = lhs.valueToCompare,
+          let target2 = rhs.valueToCompare,
           target1 === target2 && lhs.attributes == rhs.attributes else {
             return false
     }
-    
+
     return true
+}
+
+private extension ConstraintItem {
+    var valueToCompare: AnyObject? {
+        if let value = _layoutConstraintItem {
+            return value
+        } else if let target {
+            return target
+        } else {
+            return nil
+        }
+    }
 }
