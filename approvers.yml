@@ -1,0 +1,8 @@
+default:
+  count: 1
+  groups:
+    - mobile-bank-ios-performance-approvers
+  default_reviewers:
+    all_eligible: true
+  source_branch: "^(?!private_pod_release$).*+$"
+

@@ -1,6 +1,10 @@
 <img src="http://snapkit.io/images/banner.jpg" alt="" />
 
 SnapKit is a DSL to make Auto Layout easy on both iOS and OS X.
+ 
+This fork contains optimizations by removing unnecessary dynamicCasts.
+
+All versions will be suffixed with '-fork'.
 
 [![Build Status](https://travis-ci.org/SnapKit/SnapKit.svg)](https://travis-ci.org/SnapKit/SnapKit)
 [![Platform](https://img.shields.io/cocoapods/p/SnapKit.svg?style=flat)](https://github.com/SnapKit/SnapKit)
@@ -55,7 +59,7 @@ platform :ios, '10.0'
 use_frameworks!
 
 target '<Your Target Name>' do
-    pod 'SnapKit', '~> 5.0.0'
+    pod 'SnapKit', '~> 5.0.2-fork'
 end
 ```
 
@@ -64,25 +68,6 @@ Then, run the following command:
 ```bash
 $ pod install
 ```
-
-### Carthage
-
-[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
-
-You can install Carthage with [Homebrew](http://brew.sh/) using the following command:
-
-```bash
-$ brew update
-$ brew install carthage
-```
-
-To integrate SnapKit into your Xcode project using Carthage, specify it in your `Cartfile`:
-
-```ogdl
-github "SnapKit/SnapKit" ~> 5.0.0
-```
-
-Run `carthage update` to build the framework and drag the built `SnapKit.framework` into your Xcode project.
 
 ### Manually
 
